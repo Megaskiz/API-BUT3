@@ -1,17 +1,15 @@
 <?php
-function connecter_bd()
-{
-    $servername = "localhost"; // nom du serveur MySQL (ici, le serveur est en local)
-    $username = "root"; // nom d'utilisateur MySQL
-    $dbname = "projetapi"; // nom de la base de données MySQL
+function connecter_bd() {
+    try {
+        // Création de la connexion PDO à la base de données
+        $conn = new PDO("mysql:host=localhost; dbname=projetapi", 'root', '');
 
-    // Création de la connexion MySQL
-    $conn = new mysqli($servername, $username, '', $dbname);
+        // Configuration de PDO pour lever des exceptions en cas d'erreur SQL
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Vérification de la connexion
-    if ($conn->connect_error) {
-        die("Erreur de connexion à la base de données : " . $conn->connect_error);
+        return $conn; // retourne l'objet de connexion PDO
     }
-
-    return $conn; // retourne l'objet de connexion MySQL
+    catch(PDOException $e) {
+        die("Erreur de connexion à la base de données : " . $e->getMessage());
+    }
 }
