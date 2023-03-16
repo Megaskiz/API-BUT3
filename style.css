@@ -1,0 +1,60 @@
+/* Styles pour le conteneur principal */
+.container {
+    margin: auto;
+    max-width: 500px;
+    padding: 20px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Styles pour l'en-tête */
+h1 {
+    margin-top: 0;
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Styles pour le formulaire */
+form {
+    margin-top: 20px;
+    text-align: left;
+}
+
+/* Styles pour les champs de saisie */
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Styles pour le bouton de soumission */
+button[type="submit"] {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+/* Styles pour le message d'erreur */
+.erreur {
+    color: red;
+    margin-top: 10px;
+}
+
+/* Animation de fondu en entrée */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
