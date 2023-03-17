@@ -27,7 +27,7 @@ function deliver_response($status, $status_message, $data)
 function validLogin($login, $password)
 {
     $validLogin = false;
-    $result = excuteQuery("SELECT * FROM utilisateur WHERE nom = '$login' AND mdp = '$password'");
+    $result = excuteQuery("SELECT * FROM utilisateur WHERE nom = '$login' AND mdp = '$password';");
     if ($result->rowCount() > 0) {
         $validLogin = true;
     }
@@ -43,4 +43,9 @@ function excuteQuery($sql)
     } catch (PDOException $e) {
         echo '{"error":{"text":' . $e->getMessage() . '}}';
     }
+}
+function getRole($login){
+    $Tab_role = excuteQuery("SELECT role FROM utilisateur WHERE nom = '$login'");
+    $role = $Tab_role->fetch();
+    return $role[0];
 }

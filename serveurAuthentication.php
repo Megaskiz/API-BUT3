@@ -23,12 +23,13 @@ switch ($http_method) {
         $password = $data['password'];
 
         if(validLogin($login, $password)){
+            $role = getRole($login);
             $headers=array('alg'=>'HS256', 'typ'=>'JWT');
-            $playload=array('user'=>$login, 'exp'=>(time()+3600));
+            $playload=array('user'=>$login,'role'=>$role, 'exp'=>(time()+3600));
             $token = generate_jwt($headers, $playload);
-            deliver_response(200, "[R200 API REST] POST valid", $token);
+            deliver_response(200, "[R200 API REST] le token est valide", $token);
         }else{
-            deliver_response(401, "[R401 API REST] POST bad id",  $login);
+            deliver_response(401, "[R401 API REST] les identifiants sont invalides", NULL);
         }
 
         break;
@@ -37,5 +38,4 @@ switch ($http_method) {
         deliver_response(405, "[R401 API REST] POST bad request", NULL);
         break;
 }
-
 
