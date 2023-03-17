@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 16 mars 2023 à 10:06
+-- Généré le : jeu. 16 mars 2023 à 12:22
 -- Version du serveur : 10.4.24-MariaDB
 -- Version de PHP : 7.4.29
 
@@ -24,17 +24,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Structure de la table `affecter`
---
-
-CREATE TABLE `affecter` (
-  `id_utilisateur` int(11) NOT NULL,
-  `id_like` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `article`
 --
 
@@ -42,41 +31,39 @@ CREATE TABLE `article` (
   `id_article` int(11) NOT NULL,
   `titre` varchar(50) DEFAULT NULL,
   `contenu` text DEFAULT NULL,
-  `date_publication` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Structure de la table `concerner`
---
-
-CREATE TABLE `concerner` (
-  `id_article` int(11) NOT NULL,
+  `date_publication` date DEFAULT NULL,
   `id_utilisateur` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Déchargement des données de la table `article`
+--
+
+INSERT INTO `article` (`id_article`, `titre`, `contenu`, `date_publication`, `id_utilisateur`) VALUES
+(9, 'Les bienfaits du sport', 'Le sport est bénéfique pour la santé...', '2022-03-14', 1),
+(10, 'Les avantages du télétravail', 'Le télétravail présente de nombreux avantages...', '2022-03-15', 2),
+(11, 'Comment bien gérer son temps', 'Voici quelques astuces pour mieux gérer son temps...', '2022-03-16', 3),
+(12, 'Les bienfaits de la méditation', 'La méditation permet de se détendre et de se recentrer...', '2022-03-16', 4);
+
 -- --------------------------------------------------------
 
 --
--- Structure de la table `likes`
+-- Structure de la table `liker`
 --
 
-CREATE TABLE `likes` (
-  `id_like` int(11) NOT NULL,
+CREATE TABLE `liker` (
+  `id_article` int(11) NOT NULL,
+  `id_utilisateur` int(11) NOT NULL,
   `type` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
 --
--- Structure de la table `posseder`
+-- Déchargement des données de la table `liker`
 --
 
-CREATE TABLE `posseder` (
-  `id_article` int(11) NOT NULL,
-  `id_like` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES
+(11, 2, 'like'),
+(11, 6, 'dislike');
 
 -- --------------------------------------------------------
 
@@ -88,45 +75,41 @@ CREATE TABLE `utilisateur` (
   `id_utilisateur` int(11) NOT NULL,
   `nom` varchar(50) DEFAULT NULL,
   `mdp` varchar(50) DEFAULT NULL,
-  `role` enum('moderator','publisher','non_authentifie') NOT NULL
+  `role` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Déchargement des données de la table `utilisateur`
+--
+
+INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `mdp`, `role`) VALUES
+(1, 'John Doe', 'mdp123', 'non_authentifie'),
+(2, 'Alice', 'mdp123', 'moderator'),
+(3, 'Alice', 'password123', 'moderator'),
+(4, 'Carl', 'password789', 'moderator'),
+(5, 'Bob', 'mdp456', 'publisher'),
+(6, 'Dan', 'password', 'publisher'),
+(7, 'Jane Smith', '123456', 'publisher'),
+(8, 'Johnson', 'qwerty', 'publisher'),
+(9, 'Charlie', 'mdp789', 'non_authentifie');
 
 --
 -- Index pour les tables déchargées
 --
 
 --
--- Index pour la table `affecter`
---
-ALTER TABLE `affecter`
-  ADD PRIMARY KEY (`id_utilisateur`,`id_like`),
-  ADD KEY `id_like` (`id_like`);
-
---
 -- Index pour la table `article`
 --
 ALTER TABLE `article`
-  ADD PRIMARY KEY (`id_article`);
-
---
--- Index pour la table `concerner`
---
-ALTER TABLE `concerner`
-  ADD PRIMARY KEY (`id_article`,`id_utilisateur`),
+  ADD PRIMARY KEY (`id_article`),
   ADD KEY `id_utilisateur` (`id_utilisateur`);
 
 --
--- Index pour la table `likes`
+-- Index pour la table `liker`
 --
-ALTER TABLE `likes`
-  ADD PRIMARY KEY (`id_like`);
-
---
--- Index pour la table `posseder`
---
-ALTER TABLE `posseder`
-  ADD PRIMARY KEY (`id_article`,`id_like`),
-  ADD KEY `id_like` (`id_like`);
+ALTER TABLE `liker`
+  ADD PRIMARY KEY (`id_article`,`id_utilisateur`),
+  ADD KEY `id_utilisateur` (`id_utilisateur`);
 
 --
 -- Index pour la table `utilisateur`
@@ -142,44 +125,30 @@ ALTER TABLE `utilisateur`
 -- AUTO_INCREMENT pour la table `article`
 --
 ALTER TABLE `article`
-  MODIFY `id_article` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `likes`
---
-ALTER TABLE `likes`
-  MODIFY `id_like` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_article` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT pour la table `utilisateur`
 --
 ALTER TABLE `utilisateur`
-  MODIFY `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Contraintes pour les tables déchargées
 --
 
 --
--- Contraintes pour la table `affecter`
+-- Contraintes pour la table `article`
 --
-ALTER TABLE `affecter`
-  ADD CONSTRAINT `affecter_ibfk_1` FOREIGN KEY (`id_utilisateur`) REFERENCES `utilisateur` (`id_utilisateur`),
-  ADD CONSTRAINT `affecter_ibfk_2` FOREIGN KEY (`id_like`) REFERENCES `likes` (`id_like`);
+ALTER TABLE `article`
+  ADD CONSTRAINT `article_ibfk_1` FOREIGN KEY (`id_utilisateur`) REFERENCES `utilisateur` (`id_utilisateur`);
 
 --
--- Contraintes pour la table `concerner`
+-- Contraintes pour la table `liker`
 --
-ALTER TABLE `concerner`
-  ADD CONSTRAINT `concerner_ibfk_1` FOREIGN KEY (`id_article`) REFERENCES `article` (`id_article`),
-  ADD CONSTRAINT `concerner_ibfk_2` FOREIGN KEY (`id_utilisateur`) REFERENCES `utilisateur` (`id_utilisateur`);
-
---
--- Contraintes pour la table `posseder`
---
-ALTER TABLE `posseder`
-  ADD CONSTRAINT `posseder_ibfk_1` FOREIGN KEY (`id_article`) REFERENCES `article` (`id_article`),
-  ADD CONSTRAINT `posseder_ibfk_2` FOREIGN KEY (`id_like`) REFERENCES `likes` (`id_like`);
+ALTER TABLE `liker`
+  ADD CONSTRAINT `liker_ibfk_1` FOREIGN KEY (`id_article`) REFERENCES `article` (`id_article`),
+  ADD CONSTRAINT `liker_ibfk_2` FOREIGN KEY (`id_utilisateur`) REFERENCES `utilisateur` (`id_utilisateur`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
