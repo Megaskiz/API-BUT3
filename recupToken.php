@@ -6,9 +6,13 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
     $token = tokenRequest($login, $password);
     if ($token == null) {
         header('Location: page_connection.php?error=1');
+    }else{
+        //stocker le token dans une variable session
+        session_start();
+        $_SESSION['token'] = $token;
+        header('Location:clien.php');
     }
 }
-echo $token;
 
 
 function tokenRequest($login, $password)

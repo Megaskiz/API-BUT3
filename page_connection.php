@@ -17,7 +17,7 @@
         <input type="text" name="login" placeholder="Nom d'utilisateur" required>
         <input type="password" name="password" placeholder="Mot de passe" required>
         <input type="submit" value="Se connecter">
-        <p>Vous n'avez pas de compte ? <a href="clien.php">Inscrivez-vous</a></p>
+        <p>Vous n'avez pas de compte ? <a href="clien.php">Consulter le blog sans identifiant</a></p>
     </form>
 </body>
 </html>
