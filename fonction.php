@@ -27,7 +27,7 @@ function deliver_response($status, $status_message, $data)
 function validLogin($login, $password)
 {
     $validLogin = false;
-    $result = excuteQuery("SELECT * FROM utilisateur WHERE nom = '$login' AND mdp = '$password'");
+    $result = excuteQuery("SELECT * FROM utilisateur WHERE nom = '$login' AND mdp = '$password';");
     if ($result->rowCount() > 0) {
         $validLogin = true;
     }
@@ -44,3 +44,40 @@ function excuteQuery($sql)
         echo '{"error":{"text":' . $e->getMessage() . '}}';
     }
 }
+function getRole($login){
+    $Tab_role = excuteQuery("SELECT role FROM utilisateur WHERE nom = '$login'");
+    $role = $Tab_role->fetch();
+    return $role[0];
+}
+
+function getPlaylod($jwt){
+    $tokenParts = explode('.', $jwt);
+    $payload = base64_decode($tokenParts[1]);
+    return $payload;
+}
+
+function getLoginFromToken($jwt){
+    $payload = getPlaylod($jwt);
+    $login = json_decode($payload)->user;
+    return $login;
+}
+function getRoleFromToken($jwt){
+    $payload = getPlaylod($jwt);
+    $role = json_decode($payload)->role;
+    return $role;
+}
+/*function is_logged()
+{
+    session_start();
+    $tokenParts = explode('.', $jwt);
+    $payload = base64_decode($tokenParts[1]);
+    $expiration = json_decode($payload)->exp;
+	$is_token_expired = ($expiration - time()) < 0;
+
+    if($is_token_expired){
+        session_destroy();
+        header("Location: login.php");
+    }
+
+
+}*/

@@ -1,20 +1,26 @@
 <?php
 //récupaération du token avec la fonction tokenRequest
-if (isset($_GET['login']) && isset($_GET['password'])) {
-    $login = $_GET['login'];
-    $password = $_GET['password'];
+if (isset($_POST['login']) && isset($_POST['password'])) {
+    $login = $_POST['login'];
+    $password = $_POST['password'];
     $token = tokenRequest($login, $password);
     if ($token == null) {
-        header('Location: login.php');
+        header('Location: page_connection.php?error=1');
+    }else{
+        //stocker le token dans une variable session
+        session_start();
+        $_SESSION['token'] = $token;
+        header('Location:clien.php');
     }
 }
+
 
 function tokenRequest($login, $password)
 {
     $data = array("login" => $login, "password" => $password);
     $data_string = json_encode($data);
     $result = file_get_contents(
-        'http://localhost:8080/API_REST/REST/Perso/serveurAuthentication.php',
+        'http://localhost:8080/projet_api/serveurAuthentication.php',
         false,
         stream_context_create(array(
             'http' => array(
@@ -25,11 +31,9 @@ function tokenRequest($login, $password)
             )
         ))
     );
-
     //stocker le token dans une variable token
     $json = json_decode($result, true);
     $token = $json['data'];
-
     return $token;
 }
 ?>
