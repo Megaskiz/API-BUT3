@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 16 mars 2023 à 12:22
+-- Généré le : ven. 17 mars 2023 à 12:05
 -- Version du serveur : 10.4.24-MariaDB
 -- Version de PHP : 7.4.29
 
@@ -40,7 +40,6 @@ CREATE TABLE `article` (
 --
 
 INSERT INTO `article` (`id_article`, `titre`, `contenu`, `date_publication`, `id_utilisateur`) VALUES
-(9, 'Les bienfaits du sport', 'Le sport est bénéfique pour la santé...', '2022-03-14', 1),
 (10, 'Les avantages du télétravail', 'Le télétravail présente de nombreux avantages...', '2022-03-15', 2),
 (11, 'Comment bien gérer son temps', 'Voici quelques astuces pour mieux gérer son temps...', '2022-03-16', 3),
 (12, 'Les bienfaits de la méditation', 'La méditation permet de se détendre et de se recentrer...', '2022-03-16', 4);
@@ -54,7 +53,7 @@ INSERT INTO `article` (`id_article`, `titre`, `contenu`, `date_publication`, `id
 CREATE TABLE `liker` (
   `id_article` int(11) NOT NULL,
   `id_utilisateur` int(11) NOT NULL,
-  `type` varchar(50) DEFAULT NULL
+  `type` enum('like','dislike') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -75,7 +74,7 @@ CREATE TABLE `utilisateur` (
   `id_utilisateur` int(11) NOT NULL,
   `nom` varchar(50) DEFAULT NULL,
   `mdp` varchar(50) DEFAULT NULL,
-  `role` varchar(50) DEFAULT NULL
+  `role` enum('moderator','publisher') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -83,7 +82,6 @@ CREATE TABLE `utilisateur` (
 --
 
 INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `mdp`, `role`) VALUES
-(1, 'John Doe', 'mdp123', 'non_authentifie'),
 (2, 'Alice', 'mdp123', 'moderator'),
 (3, 'Alice', 'password123', 'moderator'),
 (4, 'Carl', 'password789', 'moderator'),
@@ -91,7 +89,7 @@ INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `mdp`, `role`) VALUES
 (6, 'Dan', 'password', 'publisher'),
 (7, 'Jane Smith', '123456', 'publisher'),
 (8, 'Johnson', 'qwerty', 'publisher'),
-(9, 'Charlie', 'mdp789', 'non_authentifie');
+(10, 'admin', 'admin', 'moderator');
 
 --
 -- Index pour les tables déchargées
@@ -131,7 +129,7 @@ ALTER TABLE `article`
 -- AUTO_INCREMENT pour la table `utilisateur`
 --
 ALTER TABLE `utilisateur`
-  MODIFY `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Contraintes pour les tables déchargées

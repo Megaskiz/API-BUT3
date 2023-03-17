@@ -4,6 +4,7 @@ Serveur d'authentification capable de générer des jetons JWT.
 Ce serveur est une API REST qui ne traite que les requêtes correspondant à une méthode HTTP POST. 
 Lorsque l'API reçoit des identifiants (login/mot de passe), elle les compare à des valeurs stockées en dur dans le code de l'API, et retourne un jeton JWT si les identifiants sont valides.
 */
+include('fonction.php');
 include('jwt_utils.php');
 /// Paramétrage de l'entête HTTP (pour la réponse au Client)
 header("Content-Type:application/json");
@@ -53,9 +54,8 @@ function deliver_response($status, $status_message, $data)
 
 function validLogin($login, $password)
 {
+    $bdd = connecter_bd();
     $validLogin = false;
-    if ($login == "admin" && $password == "admin") {
-        $validLogin = true;
-    }
-    return $validLogin;
+    //SELECT * FROM utilisateur WHERE nom = "admin" AND mdp = "admin"; 
+    
 }
