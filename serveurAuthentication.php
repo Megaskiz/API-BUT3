@@ -27,15 +27,15 @@ switch ($http_method) {
             $headers=array('alg'=>'HS256', 'typ'=>'JWT');
             $playload=array('user'=>$login,'role'=>$role, 'exp'=>(time()+3600));
             $token = generate_jwt($headers, $playload);
-            deliver_response(200, "[R200 API REST] le token est valide", $token);
+            deliver_response(200, "[200 API REST] le token est valide", $token);
         }else{
-            deliver_response(401, "[R401 API REST] les identifiants sont invalides", NULL);
+            deliver_response(401, "[401 API REST] les identifiants sont invalides", NULL);
         }
 
         break;
 
     default:
-        deliver_response(405, "[R401 API REST] POST bad request", NULL);
+        deliver_response(405, "[401 API REST] POST bad request", NULL);
         break;
 }
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <title>page d'aceuil</title>
@@ -14,18 +14,18 @@ include('jwt_utils.php');
 <body>
     <header>
         <h1>Page d'acceuil</h1>
-        <div>
-            <?php
-            if (isset($_SESSION['token'])) {
-                //afficher le nom d'utilisateur
-                echo getLoginFromToken($_SESSION['token']);
-                echo '<br>';
-                echo getRoleFromToken($_SESSION['token']);
-            } else {
-                echo 'Vous n\'êtes pas connecté';
-            }
-            ?>
-        </div>
+            <div>
+                <?php
+                if (isset($_SESSION['token'])) {
+                    //afficher le nom d'utilisateur
+                    echo getLoginFromToken($_SESSION['token']);
+                    echo '<br>';
+                    echo getRoleFromToken($_SESSION['token']);
+                } else {
+                    echo 'Vous n\'êtes pas connecté';
+                }
+                ?>
+            </div>
         <div>
             <?php
             if (isset($_SESSION['token'])) {
@@ -41,7 +41,7 @@ include('jwt_utils.php');
         <?php
         ////////////////// Cas des méthodes GET //////////////////
         $data = file_get_contents(
-            'http://localhost:8080/projet_api/serveurAuthentication.php',
+            'http://localhost/projet_api/serveurAuthentication.php',
             false,
             stream_context_create(array('http' => array('method' => 'GET'))) // ou DELETE
         );
@@ -56,9 +56,6 @@ include('jwt_utils.php');
             }
             ?>
         </ul>
-
     </div>
-
 </body>
-
 </html>

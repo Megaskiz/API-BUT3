@@ -23,7 +23,7 @@ switch ($http_method) {
                 $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
             }
             // Envoi de la réponse au Client
-            deliver_response(200, "ouh nice les articles" , $matchingData);
+            deliver_response(200, "Voici les articles" , $matchingData);
             break;
         
 
