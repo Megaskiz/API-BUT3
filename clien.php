@@ -56,7 +56,6 @@ include('jwt_utils.php');
             }
             ?>
         </ul>
-
     </div>
 
 </body>
