@@ -64,7 +64,7 @@ switch ($http_method) {
                     // Envoi de la réponse au Client
                     deliver_response(200, "[GET] Bonjour, vous n'est pas identifié", $matchingData);
                     break;
-            }
+                }
         } else {
             if (!empty($_GET['id_article'])) {
                 $id_article = $_GET['id_article'];
