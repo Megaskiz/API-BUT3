@@ -10,7 +10,7 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
         //stocker le token dans une variable session
         session_start();
         $_SESSION['token'] = $token;
-        header('Location:clien.php');
+       header('Location:clien.php');
     }
 }
 
@@ -20,7 +20,7 @@ function tokenRequest($login, $password)
     $data = array("login" => $login, "password" => $password);
     $data_string = json_encode($data);
     $result = file_get_contents(
-        'http://localhost:8080/projet_api/serveurAuthentication.php',
+        'http://localhost/projet_api/serveurAuthentication.php',
         false,
         stream_context_create(array(
             'http' => array(
@@ -33,6 +33,7 @@ function tokenRequest($login, $password)
     );
     //stocker le token dans une variable token
     $json = json_decode($result, true);
+    var_dump($json);
     $token = $json['data'];
     return $token;
 }
