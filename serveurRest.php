@@ -95,7 +95,7 @@ switch ($http_method) {
                 $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
             }
             // Envoi de la réponse au Client
-            deliver_response(200, "[GET] Bonjour, vous n'est pas identifié", $matchingData);
+            deliver_response(200, "[GET] Bonjour, vous n'êtes pas identifié", $matchingData);
             break;
         }
         break;
@@ -104,6 +104,8 @@ switch ($http_method) {
             // Récupération des données envoyées par le Client
             $postedData = file_get_contents('php://input');
             $data = json_decode($postedData, true);
+
+            // Traitement
             $data = $data['article'];
             $titre = $data['titre'];
             $contenu = $data['contenu'];
@@ -114,7 +116,7 @@ switch ($http_method) {
             $matchingData = $newArticle->fetchAll(PDO::FETCH_ASSOC);
         
             // Envoi de la réponse au Client avec l'article créé
-            deliver_response(201, "L'article a été ajouté avec succès", $matchingData);
+            deliver_response(200, "[POST] L'article a été ajouté avec succès", $matchingData);
             break;
 
         /// Cas de la méthode PUT
