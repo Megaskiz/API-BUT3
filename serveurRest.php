@@ -100,13 +100,22 @@ switch ($http_method) {
         }
         break;
         /// Cas de la méthode POST
-    case "POST":
-        /// Récupération des données envoyées par le Client
-        $postedData = file_get_contents('php://input');
-        /// Traitement
-        /// Envoi de la réponse au Client
-        deliver_response(201, "Votre message", NULL);
-        break;
+        case "POST":
+            // Récupération des données envoyées par le Client
+            $postedData = file_get_contents('php://input');
+            $data = json_decode($postedData, true);
+            $data = $data['article'];
+            $titre = $data['titre'];
+            $contenu = $data['contenu'];
+            $id_utilisateur = $data['id_utilisateur'];
+        
+            // Création d'un nouvel article avec les données envoyées
+            $newArticle = excuteQuery("INSERT INTO article (titre, contenu, id_utilisateur) VALUES ('" . $data['titre'] . "', '" . $data['contenu'] . "', '" . $data['id_utilisateur'] . "');");
+            $matchingData = $newArticle->fetchAll(PDO::FETCH_ASSOC);
+        
+            // Envoi de la réponse au Client avec l'article créé
+            deliver_response(201, "L'article a été ajouté avec succès", $matchingData);
+            break;
 
         /// Cas de la méthode PUT
     case "PUT":
