@@ -25,7 +25,7 @@ switch ($http_method) {
         if(validLogin($login, $password)){
             $role = getRole($login);
             $headers=array('alg'=>'HS256', 'typ'=>'JWT');
-            $playload=array('user'=>$login,'role'=>$role, 'exp'=>(time()+3600));
+            $playload=array('user'=>$login,'role'=>$role, 'exp'=>(time()+360));
             $token = generate_jwt($headers, $playload);
             deliver_response(200, "[200 API REST] le token est valide", $token);
         }else{
@@ -35,7 +35,7 @@ switch ($http_method) {
         break;
 
     default:
-        deliver_response(405, "[401 API REST] POST bad request", NULL);
+        deliver_response(405, "[API REST] Mauvaise méthode choisie, veuillez utiliser la méthode POST", NULL);
         break;
 }
 
