@@ -109,17 +109,17 @@ switch ($http_method) {
             switch ($role) {
                 case "publisher":
                     $name = getLoginFromToken($data['token']);
-                    $id_moderator= getIdFromToken($data['token']);
-                    if(!empty($data['titre']) && !empty($data['contenu'])){
+                    $id_moderator = getIdFromToken($data['token']);
+                    if (!empty($data['titre']) && !empty($data['contenu'])) {
                         $titre = $data['titre'];
                         $contenu = $data['contenu'];
-                        $date= date("Y-m-d H:i:s");
+                        $date = date("Y-m-d H:i:s");
                         $result = excuteQuery("INSERT INTO article (titre, contenu, date_publication, id_utilisateur) VALUES ('$titre', '$contenu', '$date', '$id_moderator');");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                         // Envoi de la réponse au Client
                         deliver_response(200, "[POST] Bonjour $name, vous venez de créer un article", $matchingData);
                         break;
-                    }else{
+                    } else {
                         deliver_response(200, "[POST] Bonjour $name, vous n'avez pas rempli tous les champs", NULL);
                         break;
                     }
@@ -135,6 +135,7 @@ switch ($http_method) {
             deliver_response(200, "[POST] Bonjour, vous n'etes pas connecté", NULL);
             break;
         }
+        break;
 
     case "PUT":
         //le publisher peut modifier les articles dont il est l’auteur.
@@ -150,16 +151,16 @@ switch ($http_method) {
                     $name = getLoginFromToken($data['token']);
                     $id_publisher = getIdFromToken($data['token']);
                     $id_article = $_GET['id'];
-                    if(!empty($data['titre']) && !empty($data['contenu'])){
+                    if (!empty($data['titre']) && !empty($data['contenu'])) {
                         $titre = $data['titre'];
                         $contenu = $data['contenu'];
-                        $date= date("Y-m-d H:i:s");
+                        $date = date("Y-m-d H:i:s");
                         $result = excuteQuery("UPDATE article SET titre = '$titre', contenu = '$contenu', date_publication = '$date' WHERE id_article = $id_article AND id_utilisateur = $id_publisher;");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                         // Envoi de la réponse au Client
                         deliver_response(200, "[PUT] Bonjour $name, vous venez de modifier l'article $id_article", $matchingData);
                         break;
-                    }else{
+                    } else {
                         deliver_response(200, "[PUT] Bonjour $name, vous n'avez pas rempli tous les champs", NULL);
                         break;
                     }
@@ -175,6 +176,7 @@ switch ($http_method) {
             deliver_response(200, "[PUT] Bonjour, vous n'etes pas connecté", NULL);
             break;
         }
+        break;
 
         /// Cas de la méthode DELETE
     case "DELETE":
@@ -190,7 +192,13 @@ switch ($http_method) {
                     // Récupération de l'identifiant de la ressource envoyé par le Client
                     if (!empty($_GET['id'])) {
                         /// Traitement
-                        $result = excuteQuery("DELETE FROM article WHERE id_article = $id_article");
+                        $result = excuteQuery("DELETE liker, article
+                        FROM liker
+                        INNER JOIN article
+                        ON article.id_article = liker.id_article
+                        WHERE liker.id_article = $id_article;
+                        DELETE FROM article WHERE article.id_article=$id_article ;
+                        ");
                         /// Envoi de la réponse au Client
                         deliver_response(200, "[DELETE] Bonjour $name, Vous venez de supprimer l'article $id_article", NULL);
                         break;
@@ -208,7 +216,12 @@ switch ($http_method) {
                         $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                         if ($matchingData[0]['id_utilisateur'] == $id_publisher) {
-                            $result = excuteQuery("DELETE FROM article WHERE id_article = $id_article");
+                            $result = excuteQuery("DELETE liker, article
+                            FROM liker
+                            INNER JOIN article
+                            ON article.id_article = liker.id_article
+                            WHERE liker.id_article = $id_article;
+                            DELETE FROM article WHERE article.id_article=$id_article;");
                             deliver_response(200, "[DELETE] Bonjour $name, Vous venez de supprimer l'article $id_article", NULL);
                             break;
                         } else {
@@ -230,6 +243,7 @@ switch ($http_method) {
             deliver_response(200, "[DELETE] impossible de supprimer, vous n'est pas identifié", NULL);
             break;
         }
+        break;
 
     case "LIKE":
         /*
@@ -239,37 +253,44 @@ switch ($http_method) {
         /// Récupération du body envoyé par le Client
         $postedData = file_get_contents('php://input');
         $data = json_decode($postedData, true);
-        if (is_jwt_valid($data['token'])) {
-            $role = getRoleFromToken($data['token']);
-            switch ($role) {
-                case "publisher":
-                    $name = getLoginFromToken($data['token']);
-                    $id_publisher = getIdFromToken($data['token']);
-                    $id_article = $_GET['id'];
-                    //verification que l'article appartient bien au publisher
-                    $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
-                    $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
-                    if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
-                        $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'like');");
-                        
-                        deliver_response(200, "[LIKE] Bonjour $name, Vous venez de liker l'article $id_article", NULL);
-                        break;
-                    } else {
-                        deliver_response(200, "[LIKE] impossible de liker l'article, vous etes le proprietaire", NULL);
-                        break;
-                    }
-                case "moderator":
-                    deliver_response(200, "[LIKE] Bonjour $name, vous n'avez pas le droit de liker un article", NULL);
-                    break;
+        if (!empty($_GET['id'])) {
+            if (is_jwt_valid($data['token'])) {
+                $role = getRoleFromToken($data['token']);
 
-                default:
-                    deliver_response(200, "[LIKE] Bonjour $name, vous n'etes pas connecté", NULL);
-                    break;
+                switch ($role) {
+                    case "publisher":
+                        $name = getLoginFromToken($data['token']);
+                        $id_publisher = getIdFromToken($data['token']);
+                        $id_article = $_GET['id'];
+                        //verification que l'article appartient bien au publisher
+                        $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
+                        $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
+                        if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
+                            $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'like');");
+
+                            deliver_response(200, "[LIKE] Bonjour $name, Vous venez de liker l'article $id_article", NULL);
+                            break;
+                        } else {
+                            deliver_response(200, "[LIKE] impossible de liker l'article, vous etes le proprietaire", NULL);
+                            break;
+                        }
+                    case "moderator":
+                        deliver_response(200, "[LIKE] Bonjour $name, vous n'avez pas le droit de liker un article vous n'etes pas publisher", NULL);
+                        break;
+
+                    default:
+                        deliver_response(200, "[LIKE] Bonjour $name, vous n'etes pas connecté", NULL);
+                        break;
+                }
+            } else {
+                deliver_response(200, "[LIKE] Bonjour, vous n'etes pas connecté", NULL);
+                break;
             }
         } else {
-            deliver_response(200, "[LIKE] Bonjour, vous n'etes pas connecté", NULL);
+            deliver_response(200, "[LIKE] Bonjour, vous n'avez pas renseigné l'id de l'article", NULL);
             break;
         }
+        break;
     case "DISLIKE":
         /*
         le publisher peut liker tout les articles sauf les siens.
@@ -278,47 +299,48 @@ switch ($http_method) {
         /// Récupération du body envoyé par le Client
         $postedData = file_get_contents('php://input');
         $data = json_decode($postedData, true);
-        if (is_jwt_valid($data['token'])) {
-            $role = getRoleFromToken($data['token']);
-            switch ($role) {
-                case "publisher":
-                    $name = getLoginFromToken($data['token']);
-                    $id_publisher = getIdFromToken($data['token']);
-                    $id_article = $_GET['id'];
-                    //verification que l'article appartient bien au publisher
-                    $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
-                    $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
-                    if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
-                        $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'dislike');");
-                        
-                        deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article", NULL);
-                        break;
-                    } else {
-                        deliver_response(200, "[DISLIKE] impossible de dislike l'article, vous etes le proprietaire", NULL);
-                        break;
-                    }
-                case "moderator":
-                    deliver_response(200, "[DISLIKE] Bonjour $name, vous n'avez pas le droit de dislike un article", NULL);
-                    break;
+        if (!empty($_GET['id'])) {
+            if (is_jwt_valid($data['token'])) {
+                $role = getRoleFromToken($data['token']);
+                switch ($role) {
+                    case "publisher":
+                        $name = getLoginFromToken($data['token']);
+                        $id_publisher = getIdFromToken($data['token']);
+                        $id_article = $_GET['id'];
+                        //verification que l'article appartient bien au publisher
+                        $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
+                        $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
+                        if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
+                            $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'dislike');");
 
-                default:
-                    deliver_response(200, "[DISLIKE] Bonjour $name, vous n'etes pas connecté", NULL);
-                    break;
+                            deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article", NULL);
+                            break;
+                        } else {
+                            deliver_response(200, "[DISLIKE] impossible de dislike l'article, vous etes le proprietaire", NULL);
+                            break;
+                        }
+                    case "moderator":
+                        deliver_response(200, "[DISLIKE] Bonjour $name, vous n'avez pas le droit de dislike un article", NULL);
+                        break;
+
+                    default:
+                        deliver_response(200, "[DISLIKE] Bonjour $name, vous n'etes pas connecté", NULL);
+                        break;
+                }
+            } else {
+                deliver_response(200, "[DISLIKE] Bonjour, vous n'etes pas connecté", NULL);
+                break;
             }
         } else {
-            deliver_response(200, "[DISLIKE] Bonjour, vous n'etes pas connecté", NULL);
+            deliver_response(200, "[DISLIKE] Bonjour, vous n'avez pas renseigné l'id de l'article", NULL);
             break;
         }
-       
 
+        break;
 
     default:
-        /// Récupération de l'identifiant de la ressource envoyé par le Client
-        if (!empty($_GET['mon_id'])) {
-            /// Traitement
-        }
         /// Envoi de la réponse au Client
-        deliver_response(200, "Votre message", NULL);
+        deliver_response(200, "[Default] Bonjour, vous n'avez pas renseigné de méthode", NULL);
         break;
 }
 /// Envoi de la réponse au Client
