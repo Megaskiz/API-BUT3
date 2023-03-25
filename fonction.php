@@ -49,6 +49,11 @@ function getRole($login){
     $role = $Tab_role->fetch();
     return $role[0];
 }
+function getId($login){
+    $Tab_id = excuteQuery("SELECT id_utilisateur FROM utilisateur WHERE nom = '$login'");
+    $id = $Tab_id->fetch();
+    return $id[0];
+}
 
 function getPlaylod($jwt){
     $tokenParts = explode('.', $jwt);
@@ -66,6 +71,12 @@ function getRoleFromToken($jwt){
     $role = json_decode($payload)->role;
     return $role;
 }
+function getIdFromToken($jwt){
+    $payload = getPlaylod($jwt);
+    $id = json_decode($payload)->id;
+    return $id;
+}
+
 /*function is_logged()
 {
     session_start();
