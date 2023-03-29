@@ -159,7 +159,7 @@ switch ($http_method) {
                         $result = excuteQuery("UPDATE article SET titre = '$titre', contenu = '$contenu', date_publication = '$date' WHERE id_article = $id_article AND id_utilisateur = $id_publisher;");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                         // Envoi de la réponse au Client
-                        deliver_response(200, "[PUT] Bonjour $name, vous venez de modifier l'article $id_article", $result);
+                        deliver_response(200, "[PUT] Bonjour $name, vous venez de modifier l'article $id_article", $matchingData);
                         break;
                     } else {
                         deliver_response(200, "[PUT] Bonjour $name, vous n'avez pas rempli tous les champs", NULL);
