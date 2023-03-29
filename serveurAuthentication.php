@@ -26,10 +26,10 @@ switch ($http_method) {
             $id = getId($login);
             $role = getRole($login);
             $headers=array('alg'=>'HS256', 'typ'=>'JWT');
-            $playload=array('user'=>$login,'role'=>$role, 'id'=>$id, 'exp'=>(time()+720));
+            $playload=array('user'=>$login,'role'=>$role, 'id'=>$id, 'exp'=>(time()+3600));
         
             $token = generate_jwt($headers, $playload);
-            deliver_response(200, "[200 API REST] le token est valide", $token);
+            deliver_response(200, "[200 API REST] le identifiant sont valide", $token);
         }else{
             deliver_response(401, "[401 API REST] les identifiants sont invalides", NULL);
         }
@@ -37,7 +37,7 @@ switch ($http_method) {
         break;
 
     default:
-        deliver_response(405, "[API REST] Mauvaise méthode choisie, veuillez utiliser la méthode POST", NULL);
+        deliver_response(405, "[API REST] Mauvaise méthode choisie, veuillez utiliser la méthode POST pour se connecter", NULL);
         break;
 }
 

@@ -106,9 +106,9 @@ switch ($http_method) {
         $data = json_decode($postedData, true);
         if (is_jwt_valid($data['token'])) {
             $role = getRoleFromToken($data['token']);
+            $name = getLoginFromToken($data['token']);
             switch ($role) {
                 case "publisher":
-                    $name = getLoginFromToken($data['token']);
                     $id_moderator = getIdFromToken($data['token']);
                     if (!empty($data['titre']) && !empty($data['contenu'])) {
                         $titre = $data['titre'];
@@ -146,9 +146,9 @@ switch ($http_method) {
         $data = json_decode($postedData, true);
         if (is_jwt_valid($data['token'])) {
             $role = getRoleFromToken($data['token']);
+            $name = getLoginFromToken($data['token']);
             switch ($role) {
                 case "publisher":
-                    $name = getLoginFromToken($data['token']);
                     $id_publisher = getIdFromToken($data['token']);
                     $id_article = $_GET['id'];
                     if (!empty($data['titre']) && !empty($data['contenu'])) {
@@ -185,12 +185,12 @@ switch ($http_method) {
         $data = json_decode($postedData, true);
         if (is_jwt_valid($data['token'])) {
             $role = getRoleFromToken($data['token']);
+            $name = getLoginFromToken($data['token']);
             switch ($role) {
                 case "moderator":
-                    $name = getLoginFromToken($data['token']);
-                    $id_article = $_GET['id'];
+                    $id_article = $_GET['id_article'];
                     // Récupération de l'identifiant de la ressource envoyé par le Client
-                    if (!empty($_GET['id'])) {
+                    if (!empty($_GET['id_article'])) {
                         /// Traitement
                         $result = excuteQuery("DELETE liker, article
                         FROM liker
@@ -207,10 +207,8 @@ switch ($http_method) {
                         break;
                     }
                 case "publisher":
-
-                    $name = getLoginFromToken($data['token']);
-                    $id_article = $_GET['id'];
-                    if (!empty($_GET['id'])) {
+                    $id_article = $_GET['id_article'];
+                    if (!empty($_GET['id_article'])) {
                         $id_publisher = getIdFromToken($data['token']);
                         //verification que l'article appartient bien au publisher
                         $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
@@ -253,7 +251,7 @@ switch ($http_method) {
         /// Récupération du body envoyé par le Client
         $postedData = file_get_contents('php://input');
         $data = json_decode($postedData, true);
-        if (!empty($_GET['id'])) {
+        if (!empty($_GET['id_article'])) {
             if (is_jwt_valid($data['token'])) {
                 $role = getRoleFromToken($data['token']);
 
@@ -261,7 +259,7 @@ switch ($http_method) {
                     case "publisher":
                         $name = getLoginFromToken($data['token']);
                         $id_publisher = getIdFromToken($data['token']);
-                        $id_article = $_GET['id'];
+                        $id_article = $_GET['id_article'];
                         //verification que l'article appartient bien au publisher
                         $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -299,14 +297,14 @@ switch ($http_method) {
         /// Récupération du body envoyé par le Client
         $postedData = file_get_contents('php://input');
         $data = json_decode($postedData, true);
-        if (!empty($_GET['id'])) {
+        if (!empty($_GET['id_article'])) {
             if (is_jwt_valid($data['token'])) {
                 $role = getRoleFromToken($data['token']);
                 switch ($role) {
                     case "publisher":
                         $name = getLoginFromToken($data['token']);
                         $id_publisher = getIdFromToken($data['token']);
-                        $id_article = $_GET['id'];
+                        $id_article = $_GET['id_article'];
                         //verification que l'article appartient bien au publisher
                         $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
