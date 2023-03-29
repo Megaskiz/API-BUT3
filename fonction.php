@@ -77,6 +77,24 @@ function getIdFromToken($jwt){
     return $id;
 }
 
+function checkIfLikeExist($id_user, $id_post){
+    $result = excuteQuery("SELECT * FROM `liker` WHERE id_utilisateur = $id_user AND id_article = $id_post");
+    if ($result->rowCount() > 0) {
+        return true;
+    }
+    return false;
+
+}
+
+function checkIfDislikeExist($id_user, $id_post){
+    $result = excuteQuery("SELECT * FROM `disliker` WHERE id_utilisateur = $id_user AND id_article = $id_post");
+    if ($result->rowCount() > 0) {
+        return true;
+    }
+    return false;
+
+}
+
 /*function is_logged()
 {
     session_start();
