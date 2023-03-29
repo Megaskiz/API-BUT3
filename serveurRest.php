@@ -158,7 +158,7 @@ switch ($http_method) {
                         $result = excuteQuery("UPDATE article SET titre = '$titre', contenu = '$contenu', date_publication = '$date' WHERE id_article = $id_article AND id_utilisateur = $id_publisher;");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                         // Envoi de la réponse au Client
-                        deliver_response(200, "[PUT] Bonjour $name, vous venez de modifier l'article $id_article", $matchingData);
+                        deliver_response(200, "[PUT] Bonjour $name, vous venez de modifier l'article $id_article", $result);
                         break;
                     } else {
                         deliver_response(200, "[PUT] Bonjour $name, vous n'avez pas rempli tous les champs", NULL);
@@ -260,17 +260,27 @@ switch ($http_method) {
                         $name = getLoginFromToken($data['token']);
                         $id_publisher = getIdFromToken($data['token']);
                         $id_article = $_GET['id_article'];
-                        //verification que l'article appartient bien au publisher
-                        $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
-                        $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
-                        if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
-                            $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'like');");
+                        if (checkIfDislikeExist($id_publisher, $_GET['id_article'])) {
+                            //mise a jours du like en dislike
+                            $name = getLoginFromToken($data['token']);
 
-                            deliver_response(200, "[LIKE] Bonjour $name, Vous venez de liker l'article $id_article", NULL);
+                            $id_article = $_GET['id_article'];
+                            $result = excuteQuery("UPDATE `liker` SET `type` = 'dislike' WHERE `liker`.`id_article` = $id_article AND `liker`.`id_utilisateur` = $id_publisher;");
+                            deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article que vous aviez like au prealable", NULL);
                             break;
                         } else {
-                            deliver_response(200, "[LIKE] impossible de liker l'article, vous etes le proprietaire", NULL);
-                            break;
+                            //verification que l'article appartient bien au publisher
+                            $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
+                            $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
+                            if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
+                                $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'like');");
+
+                                deliver_response(200, "[LIKE] Bonjour $name, Vous venez de liker l'article $id_article", NULL);
+                                break;
+                            } else {
+                                deliver_response(200, "[LIKE] impossible de liker l'article, vous etes le proprietaire", NULL);
+                                break;
+                            }
                         }
                     case "moderator":
                         deliver_response(200, "[LIKE] Bonjour $name, vous n'avez pas le droit de liker un article vous n'etes pas publisher", NULL);
@@ -300,22 +310,33 @@ switch ($http_method) {
         if (!empty($_GET['id_article'])) {
             if (is_jwt_valid($data['token'])) {
                 $role = getRoleFromToken($data['token']);
+                $id_publisher = getIdFromToken($data['token']);
                 switch ($role) {
                     case "publisher":
-                        $name = getLoginFromToken($data['token']);
-                        $id_publisher = getIdFromToken($data['token']);
-                        $id_article = $_GET['id_article'];
-                        //verification que l'article appartient bien au publisher
-                        $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
-                        $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
-                        if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
-                            $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'dislike');");
+                        if (checkIfLikeExist($id_publisher, $_GET['id_article'])) {
+                            //mise a jours du like en dislike
+                            $name = getLoginFromToken($data['token']);
 
-                            deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article", NULL);
+                            $id_article = $_GET['id_article'];
+                            $result = excuteQuery("UPDATE `liker` SET `type` = 'dislike' WHERE `liker`.`id_article` = $id_article AND `liker`.`id_utilisateur` = $id_publisher;");
+                            deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article que vous aviez like au prealable", NULL);
                             break;
                         } else {
-                            deliver_response(200, "[DISLIKE] impossible de dislike l'article, vous etes le proprietaire", NULL);
-                            break;
+                            $name = getLoginFromToken($data['token']);
+                            $id_publisher = getIdFromToken($data['token']);
+                            $id_article = $_GET['id_article'];
+                            //verification que l'article appartient bien au publisher
+                            $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
+                            $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
+                            if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
+                                $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'dislike');");
+                               
+                                deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article", NULL);
+                                break;
+                            } else {
+                                deliver_response(200, "[DISLIKE] impossible de dislike l'article, vous etes le proprietaire", NULL);
+                                break;
+                            }
                         }
                     case "moderator":
                         deliver_response(200, "[DISLIKE] Bonjour $name, vous n'avez pas le droit de dislike un article", NULL);
