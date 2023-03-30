@@ -49,7 +49,7 @@ switch ($http_method) {
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                     }
                     // Envoi de la réponse au Client
-                    deliver_response(200, "[GET] Bonjour, $name vous etes moderator", $matchingData);
+                    deliver_response(200, "[GET] Bonjour, $name vous êtes moderator", $matchingData);
                     break;
 
                 case "publisher":
@@ -69,7 +69,7 @@ switch ($http_method) {
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                     }
                     // Envoi de la réponse au Client
-                    deliver_response(200, "[GET] Bonjour, $name vous etes publisher", $matchingData);
+                    deliver_response(200, "[GET] Bonjour, $name vous êtes publisher", $matchingData);
                     break;
 
                 default:
@@ -82,7 +82,7 @@ switch ($http_method) {
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                     }
                     // Envoi de la réponse au Client
-                    deliver_response(200, "[GET] Bonjour, vous n'avez pas de role", $matchingData);
+                    deliver_response(200, "[GET] Bonjour, vous n'avez pas de rôle", $matchingData);
                     break;
             }
         } else {
@@ -95,7 +95,7 @@ switch ($http_method) {
                 $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
             }
             // Envoi de la réponse au Client
-            deliver_response(200, "[GET] Bonjour, vous n'est pas identifié", $matchingData);
+            deliver_response(200, "[GET] Bonjour, vous n'êtes pas identifié", $matchingData);
             break;
         }
         break;
@@ -128,11 +128,11 @@ switch ($http_method) {
                     break;
 
                 default:
-                    deliver_response(200, "[POST] Bonjour $name, vous n'etes pas connecté", NULL);
+                    deliver_response(200, "[POST] Bonjour $name, vous n'êtes pas connecté", NULL);
                     break;
             }
         } else {
-            deliver_response(200, "[POST] Bonjour, vous n'etes pas connecté", NULL);
+            deliver_response(200, "[POST] Bonjour, vous n'êtes pas connecté", NULL);
             break;
         }
         break;
@@ -149,6 +149,7 @@ switch ($http_method) {
             $name = getLoginFromToken($data['token']);
             switch ($role) {
                 case "publisher":
+                    //recuperation de l'id de l'utilisateur
                     $id_publisher = getIdFromToken($data['token']);
                     $id_article = $_GET['id'];
                     if (!empty($data['titre']) && !empty($data['contenu'])) {
@@ -158,7 +159,7 @@ switch ($http_method) {
                         $result = excuteQuery("UPDATE article SET titre = '$titre', contenu = '$contenu', date_publication = '$date' WHERE id_article = $id_article AND id_utilisateur = $id_publisher;");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                         // Envoi de la réponse au Client
-                        deliver_response(200, "[PUT] Bonjour $name, vous venez de modifier l'article $id_article", $result);
+                        deliver_response(200, "[PUT] Bonjour $name, vous venez de modifier l'article $id_article", $matchingData);
                         break;
                     } else {
                         deliver_response(200, "[PUT] Bonjour $name, vous n'avez pas rempli tous les champs", NULL);
@@ -169,11 +170,11 @@ switch ($http_method) {
                     break;
 
                 default:
-                    deliver_response(200, "[PUT] Bonjour $name, vous n'etes pas connecté", NULL);
+                    deliver_response(200, "[PUT] Bonjour $name, vous n'êtes pas connecté", NULL);
                     break;
             }
         } else {
-            deliver_response(200, "[PUT] Bonjour, vous n'etes pas connecté", NULL);
+            deliver_response(200, "[PUT] Bonjour, vous n'êtes pas connecté", NULL);
             break;
         }
         break;
@@ -203,7 +204,7 @@ switch ($http_method) {
                         deliver_response(200, "[DELETE] Bonjour $name, Vous venez de supprimer l'article $id_article", NULL);
                         break;
                     } else {
-                        deliver_response(200, "[DELETE] impossible dl'article supprimer, l'id n'est pas renseigné", NULL);
+                        deliver_response(200, "[DELETE] Impossible de supprimer l'article, elle n'éxiste pas", NULL);
                         break;
                     }
                 case "publisher":
@@ -223,22 +224,22 @@ switch ($http_method) {
                             deliver_response(200, "[DELETE] Bonjour $name, Vous venez de supprimer l'article $id_article", NULL);
                             break;
                         } else {
-                            deliver_response(200, "[DELETE] impossible de supprimer l'article, vous n'etes pas le proprietaire", NULL);
+                            deliver_response(200, "[DELETE] Impossible de supprimer l'article, vous n'êtes pas le proprietaire", NULL);
                             break;
                         }
                     } else {
-                        deliver_response(200, "[DELETE] impossible de supprimer l'article, l'id n'est pas renseigné", NULL);
+                        deliver_response(200, "[DELETE] Impossible de supprimer l'article, l'id n'est pas renseigné", NULL);
                         break;
                     }
 
                 default:
                     /// Envoi de la réponse au Client
-                    deliver_response(200, "[DELETE] impossible de supprimer, vous n'est pas identifié", NULL);
+                    deliver_response(200, "[DELETE] Impossible de supprimer, vous n'êtes pas identifié", NULL);
                     break;
             }
         } else {
             /// Envoi de la réponse au Client
-            deliver_response(200, "[DELETE] impossible de supprimer, vous n'est pas identifié", NULL);
+            deliver_response(200, "[DELETE] Impossible de supprimer, vous n'êtes pas identifié", NULL);
             break;
         }
         break;
