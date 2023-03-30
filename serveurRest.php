@@ -175,8 +175,11 @@ switch ($http_method) {
                             $date = date("Y-m-d H:i:s");
                             $result = excuteQuery("UPDATE article SET titre = '$titre', contenu = '$contenu', date_publication = '$date' WHERE id_article = $id_article AND id_utilisateur = $id_publisher;");
                             $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
+                            // Récupération du titre de l'article
+                            $result_titre = excuteQuery("SELECT titre FROM article WHERE id_article = $id_article;");
+                            $titre = $result_titre->fetchColumn();
                             // Envoi de la réponse au Client
-                            deliver_response(200, "[PUT] Bonjour $name, vous venez de modifier l'article $id_article", $matchingData);
+                            deliver_response(200, "[PUT] Bonjour $name, vous venez de modifier l'article $titre", $matchingData);
                             break;
                         } else {
                             deliver_response(200, "[PUT] Bonjour $name, vous n'avez pas rempli tous les champs", NULL);
@@ -212,28 +215,33 @@ switch ($http_method) {
                         $id_article = $_GET['id_article'];
                         // Récupération de l'identifiant de la ressource envoyé par le Client
                         if (!empty($_GET['id_article'])) {
-                            /// Traitement
+                            /// Traitement 
+                            // Récupération du titre de l'article
+                            $result_titre = excuteQuery("SELECT titre FROM article WHERE id_article = $id_article;");
+                            $titre = $result_titre->fetchColumn();
+                            // Ajouter la requête pour supprimer l'article et les likes associés
                             $result = excuteQuery("DELETE liker, article
-                        FROM liker
-                        INNER JOIN article
-                        ON article.id_article = liker.id_article
-                        WHERE liker.id_article = $id_article;
-                        DELETE FROM article WHERE article.id_article=$id_article ;
-                        ");
-                            /// Envoi de la réponse au Client
-                            deliver_response(200, "[DELETE] Bonjour $name, Vous venez de supprimer l'article $id_article", NULL);
-                            break;
-                        } else {
-                            deliver_response(200, "[DELETE] Impossible de supprimer l'article, elle n'éxiste pas", NULL);
+                                        FROM liker
+                                        INNER JOIN article
+                                        ON article.id_article = liker.id_article
+                                        WHERE liker.id_article = $id_article;
+                                        DELETE FROM article WHERE article.id_article=$id_article ;
+                                        ");
+                            // Envoi de la réponse au Client avec le titre récupéré
+                            deliver_response(200, "[DELETE] Bonjour $name, Vous venez de supprimer l'article $titre", NULL);
                             break;
                         }
                     case "publisher":
                         $id_article = $_GET['id_article'];
                         if (!empty($_GET['id_article'])) {
                             $id_publisher = getIdFromToken(get_bearer_token());
+                            // Ajouter la requête pour récupérer le titre de l'article
                             //verification que l'article appartient bien au publisher
-                            $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
+                            $result = excuteQuery("SELECT id_utilisateur, titre FROM article WHERE id_article = $id_article");
                             $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
+                            // Récupération du titre de l'article
+                            $result_titre = excuteQuery("SELECT titre FROM article WHERE id_article = $id_article;");
+                            $titre = $result_titre->fetchColumn();
                             if ($matchingData[0]['id_utilisateur'] == $id_publisher) {
                                 $result = excuteQuery("DELETE liker, article
                             FROM liker
@@ -241,7 +249,7 @@ switch ($http_method) {
                             ON article.id_article = liker.id_article
                             WHERE liker.id_article = $id_article;
                             DELETE FROM article WHERE article.id_article=$id_article;");
-                                deliver_response(200, "[DELETE] Bonjour $name, Vous venez de supprimer l'article $id_article", NULL);
+                                deliver_response(200, "[DELETE] Bonjour $name, Vous venez de supprimer l'article $titre", NULL);
                                 break;
                             } else {
                                 deliver_response(200, "[DELETE] Impossible de supprimer l'article, vous n'êtes pas le proprietaire", NULL);
@@ -288,19 +296,25 @@ switch ($http_method) {
                             if (checkIfDislikeExist($id_publisher, $_GET['id_article'])) {
                                 //mise a jours du like en dislike
                                 $name = getLoginFromToken(get_bearer_token());
+                                // Récupération du titre de l'article
+                                $result_titre = excuteQuery("SELECT titre FROM article WHERE id_article = $id_article;");
+                                $titre = $result_titre->fetchColumn();
 
                                 $id_article = $_GET['id_article'];
                                 $result = excuteQuery("UPDATE `liker` SET `type` = 'dislike' WHERE `liker`.`id_article` = $id_article AND `liker`.`id_utilisateur` = $id_publisher;");
-                                deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article que vous aviez like au prealable", NULL);
+                                deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $titre que vous aviez like au prealable", NULL);
                                 break;
                             } else {
                                 //verification que l'article appartient bien au publisher
                                 $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
                                 $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
+                                // Récupération du titre de l'article
+                                $result_titre = excuteQuery("SELECT titre FROM article WHERE id_article = $id_article;");
+                                $titre = $result_titre->fetchColumn();
                                 if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
                                     $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'like');");
 
-                                    deliver_response(200, "[LIKE] Bonjour $name, Vous venez de liker l'article $id_article", NULL);
+                                    deliver_response(200, "[LIKE] Bonjour $name, Vous venez de liker l'article $titre", NULL);
                                     break;
                                 } else {
                                     deliver_response(200, "[LIKE] impossible de liker l'article, vous etes le proprietaire", NULL);
@@ -347,7 +361,10 @@ switch ($http_method) {
 
                                 $id_article = $_GET['id_article'];
                                 $result = excuteQuery("UPDATE `liker` SET `type` = 'dislike' WHERE `liker`.`id_article` = $id_article AND `liker`.`id_utilisateur` = $id_publisher;");
-                                deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article que vous aviez like au prealable", NULL);
+                                // Récupération du titre de l'article
+                                $result_titre = excuteQuery("SELECT titre FROM article WHERE id_article = $id_article;");
+                                $titre = $result_titre->fetchColumn();
+                                deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $titre que vous aviez like au prealable", NULL);
                                 break;
                             } else {
                                 $name = getLoginFromToken(get_bearer_token());
@@ -356,10 +373,13 @@ switch ($http_method) {
                                 //verification que l'article appartient bien au publisher
                                 $result = excuteQuery("SELECT id_utilisateur FROM article WHERE id_article = $id_article");
                                 $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
+                                // Récupération du titre de l'article
+                                $result_titre = excuteQuery("SELECT titre FROM article WHERE id_article = $id_article;");
+                                $titre = $result_titre->fetchColumn();
                                 if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
                                     $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'dislike');");
 
-                                    deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article", NULL);
+                                    deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $titre", NULL);
                                     break;
                                 } else {
                                     deliver_response(200, "[DISLIKE] impossible de dislike l'article, vous etes le proprietaire", NULL);
