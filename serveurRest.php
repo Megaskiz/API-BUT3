@@ -5,17 +5,19 @@ include('jwt_utils.php');
 /// Paramétrage de l'entête HTTP (pour la réponse au Client)
 header("Content-Type:application/json");
 /// Identification du type de méthode HTTP envoyée par le client
+$secret = "HereistherestapiofadamandjonathaninphpfortheresourceR4.01";
+
 $http_method = $_SERVER['REQUEST_METHOD'];
+
+/// Récupération du body envoyé par le Client
+$postedData = file_get_contents('php://input');
+$data = json_decode($postedData, true);
+
 switch ($http_method) {
 
-        /// Cas de la méthode GET
     case "GET":
-        // Récupération du body
-        $postedData = file_get_contents('php://input');
-        $data = json_decode($postedData, true);
-        if (is_jwt_valid($data['token'])) {
+        if (is_jwt_valid($data['token'], $secret)) {
             switch (getRoleFromToken($data['token'])) {
-
                 case "moderator":
                     $name = getLoginFromToken($data['token']);
                     // Récupération des critères de recherche envoyés par le Client
@@ -62,7 +64,9 @@ switch ($http_method) {
                         COUNT(CASE WHEN liker.type = 'dislike' THEN 1 ELSE NULL END) AS nombre_dislikes
                         FROM article
                         LEFT JOIN liker ON article.id_article = liker.id_article
-                        GROUP BY article.id_article;");
+                        WHERE article.id_article = $id_article
+                        GROUP BY article.id_article;
+                        ;");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                     } else {
                         $result = excuteQuery("SELECT * FROM article ;");
@@ -101,10 +105,7 @@ switch ($http_method) {
         break;
         /// Cas de la méthode POST
     case "POST":
-        /// Récupération des données envoyées par le Client
-        $postedData = file_get_contents('php://input');
-        $data = json_decode($postedData, true);
-        if (is_jwt_valid($data['token'])) {
+        if (is_jwt_valid($data['token'], $secret)) {
             $role = getRoleFromToken($data['token']);
             $name = getLoginFromToken($data['token']);
             switch ($role) {
@@ -117,7 +118,7 @@ switch ($http_method) {
                         $result = excuteQuery("INSERT INTO article (titre, contenu, date_publication, id_utilisateur) VALUES ('$titre', '$contenu', '$date', '$id_moderator');");
                         $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                         // Envoi de la réponse au Client
-                        deliver_response(200, "[POST] Bonjour $name, vous venez de créer un article", $matchingData);
+                        deliver_response(200, "[POST] Bonjour $name, vous venez de créer un article", $result);
                         break;
                     } else {
                         deliver_response(200, "[POST] Bonjour $name, vous n'avez pas rempli tous les champs", NULL);
@@ -140,11 +141,7 @@ switch ($http_method) {
     case "PUT":
         //le publisher peut modifier les articles dont il est l’auteur.
         //le modérateur peut modifier aucun article.
-
-        /// Récupération des données envoyées par le Client
-        $postedData = file_get_contents('php://input');
-        $data = json_decode($postedData, true);
-        if (is_jwt_valid($data['token'])) {
+        if (is_jwt_valid($data['token'], $secret)) {
             $role = getRoleFromToken($data['token']);
             $name = getLoginFromToken($data['token']);
             switch ($role) {
@@ -182,9 +179,8 @@ switch ($http_method) {
         /// Cas de la méthode DELETE
     case "DELETE":
         /// Récupération du body envoyé par le Client
-        $postedData = file_get_contents('php://input');
-        $data = json_decode($postedData, true);
-        if (is_jwt_valid($data['token'])) {
+
+        if (is_jwt_valid($data['token'], $secret)) {
             $role = getRoleFromToken($data['token']);
             $name = getLoginFromToken($data['token']);
             switch ($role) {
@@ -249,11 +245,10 @@ switch ($http_method) {
         le publisher peut liker tout les articles sauf les siens.
         le modérateur ne peut pas liker tout les articles.
         */
-        /// Récupération du body envoyé par le Client
-        $postedData = file_get_contents('php://input');
-        $data = json_decode($postedData, true);
+
+
         if (!empty($_GET['id_article'])) {
-            if (is_jwt_valid($data['token'])) {
+            if (is_jwt_valid($data['token'], $secret)) {
                 $role = getRoleFromToken($data['token']);
 
                 switch ($role) {
@@ -306,10 +301,9 @@ switch ($http_method) {
         le modérateur ne peut pas liker tout les articles.
         */
         /// Récupération du body envoyé par le Client
-        $postedData = file_get_contents('php://input');
-        $data = json_decode($postedData, true);
+
         if (!empty($_GET['id_article'])) {
-            if (is_jwt_valid($data['token'])) {
+            if (is_jwt_valid($data['token'], $secret)) {
                 $role = getRoleFromToken($data['token']);
                 $id_publisher = getIdFromToken($data['token']);
                 switch ($role) {
@@ -331,7 +325,7 @@ switch ($http_method) {
                             $matchingData  = $result->fetchAll(PDO::FETCH_ASSOC);
                             if ($matchingData[0]['id_utilisateur'] != $id_publisher) {
                                 $result = excuteQuery("INSERT INTO `liker` (`id_article`, `id_utilisateur`, `type`) VALUES ('$id_article', '$id_publisher', 'dislike');");
-                               
+
                                 deliver_response(200, "[DISLIKE] Bonjour $name, Vous venez de dislike l'article $id_article", NULL);
                                 break;
                             } else {

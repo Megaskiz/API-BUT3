@@ -18,6 +18,7 @@ header("Content-Type:application/json");
 $http_method = $_SERVER['REQUEST_METHOD'];
 
 //switch pour le choix de la méthode HTTP
+$secret="HereistherestapiofadamandjonathaninphpfortheresourceR4.01";
 switch ($http_method) {
 
     /// Cas de la méthode POST
@@ -37,7 +38,7 @@ switch ($http_method) {
             //création du jeton jwt
             $headers=array('alg'=>'HS256', 'typ'=>'JWT');
             $playload=array('user'=>$login,'role'=>$role, 'id'=>$id, 'exp'=>(time()+3600));
-            $token = generate_jwt($headers, $playload);
+            $token = generate_jwt($headers, $playload,$secret);
 
             //envoi de la réponse au client avec le jeton jwt
             deliver_response(200, "[200 API REST] le identifiant sont valide", $token);
