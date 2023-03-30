@@ -1,4 +1,5 @@
 <?php
+//fonction php qui ce connecte a la base de donnees
 function connecter_bd()
 {
     try {
@@ -10,6 +11,7 @@ function connecter_bd()
     }
 }
 
+//fontion php qui envoie une reponse au format json
 function deliver_response($status, $status_message, $data)
 {
     /// Paramétrage de l'entête HTTP, suite
@@ -24,6 +26,7 @@ function deliver_response($status, $status_message, $data)
     echo $json_response;
 }
 
+//fonction php qui permet de verifier si un utilisateur et inscrit dans la base de donnee avec son login et son mot de passe
 function validLogin($login, $password)
 {
     $validLogin = false;
@@ -33,6 +36,7 @@ function validLogin($login, $password)
     }
     return $validLogin;
 }
+//fonction php qui permet d'executer une requete sql
 function excuteQuery($sql)
 {
     $bd=connecter_bd();
@@ -44,39 +48,44 @@ function excuteQuery($sql)
         echo '{"error":{"text":' . $e->getMessage() . '}}';
     }
 }
+//fonction php qui permet de recuperer le role d'un utilisateur a partir de son login
 function getRole($login){
     $Tab_role = excuteQuery("SELECT role FROM utilisateur WHERE nom = '$login'");
     $role = $Tab_role->fetch();
     return $role[0];
 }
+//fonction php qui permet de recuperer l'id d'un utilisateur a partir de son login
 function getId($login){
     $Tab_id = excuteQuery("SELECT id_utilisateur FROM utilisateur WHERE nom = '$login'");
     $id = $Tab_id->fetch();
     return $id[0];
 }
-
+//fonction php qui permet de recuperer le payload d'un token
 function getPlaylod($jwt){
     $tokenParts = explode('.', $jwt);
     $payload = base64_decode($tokenParts[1]);
     return $payload;
 }
-
+//fonction php qui permet de recuperer le login d'un utilisateur a partir de son token
 function getLoginFromToken($jwt){
     $payload = getPlaylod($jwt);
     $login = json_decode($payload)->user;
     return $login;
 }
+//fonction php qui permet de recuperer le role d'un utilisateur a partir de son token
 function getRoleFromToken($jwt){
     $payload = getPlaylod($jwt);
     $role = json_decode($payload)->role;
     return $role;
 }
+//fonction php qui permet de recuperer l'id d'un utilisateur a partir de son token
 function getIdFromToken($jwt){
     $payload = getPlaylod($jwt);
     $id = json_decode($payload)->id;
     return $id;
 }
 
+//fonction php qui permet de verifier si un utilisateur a deja like un article
 function checkIfLikeExist($id_user, $id_post){
     $result = excuteQuery("SELECT * FROM `liker` WHERE id_utilisateur = $id_user AND id_article = $id_post");
     if ($result->rowCount() > 0) {
@@ -86,6 +95,7 @@ function checkIfLikeExist($id_user, $id_post){
 
 }
 
+//fonction php qui permet de verifier si un utilisateur a deja dislike un article
 function checkIfDislikeExist($id_user, $id_post){
     $result = excuteQuery("SELECT * FROM `disliker` WHERE id_utilisateur = $id_user AND id_article = $id_post");
     if ($result->rowCount() > 0) {
@@ -94,19 +104,3 @@ function checkIfDislikeExist($id_user, $id_post){
     return false;
 
 }
-
-/*function is_logged()
-{
-    session_start();
-    $tokenParts = explode('.', $jwt);
-    $payload = base64_decode($tokenParts[1]);
-    $expiration = json_decode($payload)->exp;
-	$is_token_expired = ($expiration - time()) < 0;
-
-    if($is_token_expired){
-        session_destroy();
-        header("Location: login.php");
-    }
-
-
-}*/
