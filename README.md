@@ -1,15 +1,17 @@
-PROJET API REST
+PROJET API REST/R4.01
 
 Binome BEZARA Jonathan, MENDES  Adam
 Groupe C
 
 PROJET : 
+
 Le projet vise à fournir une solution complète de gestion d'articles de blogs, basée sur une ou plusieurs API REST.
 Nous nous concentrerons sur le développement du backend et utiliserons Postman comme client. 
 
 ACCEDER A L'APPLICATION :
 
 moderator : 
+
 -identifiant : Admin         
 -mdp : admin  
 
@@ -18,6 +20,7 @@ moderator :
 
 
 publisher : 
+
 -identifiant : Alice              
 -mdp : Alice123                         
 
