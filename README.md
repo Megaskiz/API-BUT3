@@ -3,23 +3,33 @@ PROJET API REST
 Binome BEZARA Jonathan, MENDES  Adam
 Groupe C
 
-Projet : 
+PROJET : 
 Le projet vise à fournir une solution complète de gestion d'articles de blogs, basée sur une ou plusieurs API REST.
 Nous nous concentrerons sur le développement du backend et utiliserons Postman comme client. 
 
-Pour les différents comtpes pour accèder :
+ACCEDER A L'APPLICATION :
 
 moderator : 
-identifiant : Admin         identifiant : Test
-mdp : admin                 mdp : azerty
+-identifiant : Admin         
+-mdp : admin  
+
+-identifiant : Test              
+-mdp : azerty
 
 
 publisher : 
-identifiant : Alice         identifiant : Bob       identifiant : Carl
-mdp : Alice123              mdp : Bob123            mdp : Carl123
+-identifiant : Alice              
+-mdp : Alice123                         
+
+-identifiant : Bob
+-mdp : Bob123
+
+-identifiant : Carl
+-mdp : Carl123
 
 
-Si vous souhaitez importer des données dans la base de données :
+
+VOUS VOULEZ IMPORTER DES DONNEES DANS LA BD :
 
 Articles: 
 - INSERT INTO `article` (`id_article`, `titre`, `contenu`, `date_publication`, `id_utilisateur`) VALUES
@@ -37,7 +47,3 @@ IMPORT LA BD PhpMyAdmin :
 
 
 
-
-
-
-	
