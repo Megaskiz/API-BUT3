@@ -39,8 +39,10 @@ Articles:
 ('id_article', 'Titre', 'contenu', '0000-00-00', 'id_utilisateur');
 
 Utilisateurs : 
-- un moderator ('id_utilisateur', 'Test', 'mdp', 'moderator');
-- un publisher ('id_utilisateur', 'Nom', 'mdp', 'publisher');
+
+- INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `mdp`, `role`) VALUES
+    - un moderator: ('id_utilisateur', 'Test', 'mdp', 'moderator');
+    - un publisher: ('id_utilisateur', 'Nom', 'mdp', 'publisher');
 
 
 IMPORTER LA BD DANS PhpMyAdmin :
