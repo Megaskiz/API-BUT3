@@ -11,7 +11,6 @@ Nous nous concentrerons sur le développement du backend et utiliserons Postman 
 ACCEDER A L'APPLICATION :
 
 moderator : 
-
 -identifiant : Admin         
 -mdp : admin  
 
@@ -20,7 +19,6 @@ moderator :
 
 
 publisher : 
-
 -identifiant : Alice              
 -mdp : Alice123                         
 
@@ -43,7 +41,7 @@ Utilisateurs :
 - un publisher ('id_utilisateur', 'Nom', 'mdp', 'publisher');
 
 
-IMPORTer LA BD DANS PhpMyAdmin :
+IMPORTER LA BD DANS PhpMyAdmin :
 - vous créez un nouvelle BD appelée : "projetapi"
 - vous aller dans l'onglet 'import' en haut de la page 
 - ajoutez le fichier "projetapi.bd" qui se situe dans le projet /bd/projetapi.bd
