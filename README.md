@@ -8,6 +8,8 @@ PROJET :
 Le projet vise à fournir une solution complète de gestion d'articles de blogs, basée sur une ou plusieurs API REST.
 Nous nous concentrerons sur le développement du backend et utiliserons Postman comme client. 
 
+La procédure de connexion sur POSTMAN est dans la documentation.
+
 ACCEDER A L'APPLICATION :
 
 moderator : 
