@@ -11,6 +11,7 @@ Nous nous concentrerons sur le développement du backend et utiliserons Postman 
 ACCEDER A L'APPLICATION :
 
 moderator : 
+
 -identifiant : Admin         
 -mdp : admin  
 
@@ -19,6 +20,7 @@ moderator :
 
 
 publisher : 
+
 -identifiant : Alice              
 -mdp : Alice123                         
 
